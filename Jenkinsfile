@@ -1,23 +1,29 @@
 pipeline {
 	agent {
-		label "slave-1"
-			}
-		stages {
-				stage ("this is stage-1") {
-					steps {
-						
-						sh "sudo yum install docker -y"
-						sh "sudo systemctl start docker"
-						sh "sudo docker run -itdp 80:80 --name server httpd"
-						sh "sudo docker cp index.html server:/usr/local/apache2/htdocs"
-				}
-
-			}		
-	
+			label "built-in"
+			customWorkspace "/mnt/project"
 		}
- }		
+		stages {
+			stage ("copy-git-index-file") {
+				steps {
+					sh "rm -rf /var/lib/docker/volumes/vol1/_data/index.html"
+					sh "cp /mnt/project/index.html /var/lib/docker/volumes/vol1/_data/"	
+				}
+			}
+			stage ("install docker") {
+				steps {
+					sh "docker run -itdp 81:80 -v vol1:/usr/local/apache2/htdocs/ --name siya httpd"
+					
+			}
 			
+		}
 	
+	}
+
+
+}	
+			
+			
 	
 	
 	
